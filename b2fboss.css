@@ -1,0 +1,74 @@
+body {
+    background-color: #33cc00;
+    color: #FDFFFF;
+    width: 500px;
+    margin-right: auto;
+    margin-left : auto;
+}
+
+button {
+    padding: 5px 20px;
+    background-color: #9900cc;
+    border-radius: 10px;
+    color: #FDFFFF;
+    border-color: #2E6DA4;
+    border-style: none;
+    font-size: 1.2em;
+    width: 180px;
+    height: 50px;
+}
+
+#canvas {
+    position: absolute;
+    top: 150px;
+} 
+
+#sample-area1 {
+    margin-left: 200px;
+    float: left;
+} 
+
+#sample-area2 {
+    margin: auto;
+    float: left;
+    padding-left: 12px;
+} 
+
+#sample-area3 {
+    margin: auto;
+    float: left;
+    padding-left: 12px;
+}
+
+#sample-area4 {
+    margin: auto;
+    float: left;
+    padding-left: 12px;
+}
+
+#title-area {
+    text-align: center;
+}
+
+#result-area {
+    position: absolute;
+    top: 650px;
+}
+
+#status-area {
+    position: absolute;
+    top: 700px;
+}
+
+#remarks-area {
+    position: absolute;
+    top: 750px;
+}
+
+#button-area {
+    position: absolute;
+    top: 820px;
+    margin-left: 150px;
+}
+
+
