@@ -1,0 +1,35 @@
+body {
+    background-color: #33cc00;
+    color: #FDFFFF;
+    width: 700px;
+    margin-right: auto;
+    margin-left : auto;
+}
+
+button {
+    padding: 5px 20px;
+    background-color: #9900cc;
+    border-radius: 10px;
+    color: #FDFFFF;
+    border-color: #2E6DA4;
+    border-style: none;
+    font-size: 1.2em;
+    width: 180px;
+    height: 50px;
+}
+
+input {
+    height: 20px;
+}
+
+#text-area {
+    text-align: center;
+}
+
+#button-area {
+    text-align:center;
+}
+
+#title-area {
+    text-align: center;
+}
