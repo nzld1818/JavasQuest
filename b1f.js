@@ -1,0 +1,388 @@
+(function () {
+  'use strict';
+/*
+ *** 地下1階用jsファイル
+*/
+  //変数定義部
+  var randomNumber = 0;                   // タイプする文字列を選ぶ時の乱数の格納用
+  var flgTypeEnd = 0;                     // タイピングを終えたかどうかの判定フラグ
+  var dispTypeText = null;                // タイプするテキストの見本を表示する時用
+  var startTime = null;                   // タイマーのスタート時間
+  var typedCount = 0;                     // 入力済みテキスト文字数のカウント用
+  var points = 0;                         // タイピングによって得た点数
+  var remainingWalkCount = 300;           // 残り歩数のカウント用
+  var sampleDivided = [                   // HTMLのdiv領域（タイプする文字列表示エリア）
+    document.getElementById('sample-area1'),
+    document.getElementById('sample-area2'),
+    document.getElementById('sample-area3'),
+    document.getElementById('sample-area4'),
+    document.getElementById('sample-area5')
+  ];
+  var bossButtleButton = document.createElement( "BUTTON" );    // ゴール到達後のボタン表示用
+
+  // 定数定義部
+  const allRemainingwalkCounts = 300;     // スタートからゴールまでの歩数を入れておく変数
+
+  const typingTextCharNumber = 5;         // typingTextsの各要素の文字数
+  const typingTexts = [                   // 表示用タイピング文字列
+    'april',
+    'block',
+    'cause',
+    'drive',
+    'exact',
+    'frame',
+    'guest',
+    'heavy',
+    'image',
+    'jeans',
+    'knock',
+    'label',
+    'medal',
+    'never',
+    'owner',
+    'paper',
+    'queue',
+    'reach',
+    'start',
+    'table',
+    'under',
+    'visit',
+    'which',
+    'xenon',
+    'young',
+    'zebra'
+  ];
+  const typingTextElementNumber = 26;                   // typingTextsの要素数
+  const resultText = document.createElement('h2');      // HTMLのdiv領域
+  const statusText = document.createElement('h2');
+  const remarksText = document.createElement('h2');
+  const resultDivided = document.getElementById('result-area');
+  const statusDivided = document.getElementById('status-area');
+  const remarksDivided = document.getElementById('remarks-area');
+
+  // 実行部
+  displayGraphic();
+  displayStartText();
+  setTimeout(() => {
+    displayTypingText();
+  }, 3000);
+  
+  // 関数定義部
+  /**
+  * 指定した要素の子どもを全て除去する関数
+  * @param {HTMLElement} element HTMLの要素
+  */
+  function removeAllChildren(element) {
+    while (element.firstChild) {          // 子どもの要素があるかぎり除去
+      element.removeChild(element.firstChild);
+    }
+  }
+
+  /**
+  * プレーヤーがタイピングするべき文字列を画面に表示する関数
+  */
+  function displayTypingText() {
+    // 乱数の取得（texts配列から任意の要素を1つ取り出すために使う）
+    randomNumber = Math.floor( Math.random() * typingTextElementNumber );
+    dispTypeText = typingTexts[randomNumber];
+    for (var i=0; i<typingTextCharNumber; i++) {
+        const header = document.createElement('h1');
+        header.innerText = dispTypeText.slice(i,i+1);
+        sampleDivided[i].appendChild(header);
+    }
+  }
+
+  /**
+  * ゲームスタート時にテキストの画面表示を行う関数
+  */
+  function displayStartText() {
+    removeAllChildren(resultDivided);
+    resultText.innerText = '画面の上の文字をタイピングして前へ進もう！';
+    resultDivided.style.color = "#ff0000";
+    resultDivided.appendChild(resultText);
+    setTimeout(() => {
+      displayStatus();
+      removeAllChildren(resultDivided);
+    }, 3000);
+  }
+
+  /**
+  * ゲーム進行状況を画面に表示する関数
+  */
+ function displayStatus() {
+  removeAllChildren(statusDivided);
+  statusText.innerText = '地上まであと ' + remainingWalkCount + ' 歩!';
+  statusDivided.appendChild(statusText);
+　}
+
+ /**
+  * ダンジョン画面を描画する関数
+  */  
+ function displayGraphic() {
+  var graphicDivided = document.getElementById('canvas');
+  var ctx = graphicDivided.getContext('2d');
+  // パスの開始
+  ctx.beginPath();
+  // 外側の左線
+  ctx.moveTo(10, 10);     // 起点
+  ctx.lineTo(10, 490);    // 終点
+  // 外側の右線
+  ctx.moveTo(490, 10);    // 起点
+  ctx.lineTo(490, 490);   // 終点
+  // 左上からの斜め線
+  ctx.moveTo(10, 10);     // 起点
+  ctx.lineTo(170, 170);   // 終点
+  // 左下からの斜め線
+  ctx.moveTo(10, 490);    // 起点
+  ctx.lineTo(170, 330);   // 終点
+  // 右上からの斜め線
+  ctx.moveTo(490, 10);    // 起点
+  ctx.lineTo(330, 170);   // 終点
+  // 右下からの斜め線
+  ctx.moveTo(490, 490);   // 起点
+  ctx.lineTo(330, 330);   // 終点
+  // 内側の左線
+  ctx.moveTo(170, 170);   // 起点
+  ctx.lineTo(170, 330);   // 終点
+  // 内側の右線
+  ctx.moveTo(330, 170);   // 起点
+  ctx.lineTo(330, 330);   // 終点
+
+  ctx.fillStyle = "#3399ff";      // 背景色の指定
+  ctx.strokeStyle = "#ffffff";    // 線の色の指定
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.stroke();   // 描画
+}
+
+  /**
+  * ダンジョン（階段あり）画面を描画する関数
+  */  
+  function displayGoalGraphic() {
+    var graphicDivided = document.getElementById('canvas');
+    var ctx = graphicDivided.getContext('2d');
+    // パスの開始
+    ctx.beginPath();
+    // 外側の左線
+    ctx.moveTo(10, 10);     // 起点
+    ctx.lineTo(10, 490);    // 終点
+    // 外側の右線
+    ctx.moveTo(490, 10);    // 起点
+    ctx.lineTo(490, 490);   // 終点
+    // 左上からの斜め線
+    ctx.moveTo(10, 10);     // 起点
+    ctx.lineTo(170, 170);   // 終点
+    // 左下からの斜め線
+    ctx.moveTo(10, 490);    // 起点
+    ctx.lineTo(170, 330);   // 終点
+    // 右上からの斜め線
+    ctx.moveTo(490, 10);    // 起点
+    ctx.lineTo(330, 170);   // 終点
+    // 右下からの斜め線
+    ctx.moveTo(490, 490);   // 起点
+    ctx.lineTo(330, 330);   // 終点
+    // 内側の左線
+    ctx.moveTo(170, 170);   // 起点
+    ctx.lineTo(170, 330);   // 終点
+    // 内側の右線
+    ctx.moveTo(330, 170);   // 起点
+    ctx.lineTo(330, 330);   // 終点
+    // 内側の上線
+    ctx.moveTo(170, 170);   // 起点
+    ctx.lineTo(330, 170);   // 終点
+    // 内側の下線
+    ctx.moveTo(170, 330);   // 起点
+    ctx.lineTo(330, 330);   // 終点
+    ctx.clearRect(200, 10, 5, 480);
+
+    ctx.fillStyle = "#3399ff";      // 背景色の指定
+    ctx.strokeStyle = "#ffffff";    // 線色の指定
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.stroke();   // 描画
+
+    // 階段の描画
+    ctx.fillStyle = "#ffffff";        // 背景色の指定
+    ctx.fillRect(200, 10, 5, 330);  // 階段左側の縦線
+    ctx.fillRect(295, 10, 5, 330);  // 階段右側の縦線
+    ctx.fillRect(200, 20, 95, 5);   // 階段の足場（横線、以下同じ）
+    ctx.fillRect(200, 70, 95, 5); 
+    ctx.fillRect(200, 120, 95, 5); 
+    ctx.fillRect(200, 170, 95, 5); 
+    ctx.fillRect(200, 220, 95, 5); 
+    ctx.fillRect(200, 270, 95, 5); 
+    ctx.stroke();   // 描画
+    
+    // 上階の光部分の描画
+    ctx.beginPath();
+		ctx.moveTo(120,10); // 最初の点の場所
+		ctx.lineTo(200,10); // 2番目の点の場所
+		ctx.lineTo(200,40); // 3番目の点の場所
+    ctx.closePath();
+    ctx.stroke();       // 描画
+    ctx.fillStyle = "#ffffff";      // 背景色の指定
+    ctx.fill();
+
+    ctx.beginPath();
+		ctx.moveTo(380,10); // 最初の点の場所
+		ctx.lineTo(300,10); // 2番目の点の場所
+		ctx.lineTo(300,40); // 3番目の点の場所
+    ctx.closePath();
+    ctx.stroke();       // 描画
+    ctx.fillStyle = "#ffffff";      // 背景色の指定
+    ctx.fill();
+    ctx.fillRect(200, 10, 100, 30);   // 四角形の描画 
+  }
+
+  /**
+  * ボスのグラフィックを描画する関数
+  */ 
+  function displayBossGraphic() {
+    var graphicDivided = document.getElementById('canvas');
+    var cboss = graphicDivided.getContext('2d');
+    var img = new Image();
+    img.src = 'dragon.png';
+    img.onload = function() {
+      cboss.imageSmoothingEnabled = false;        // 画像がぼやけないようにする
+      cboss.drawImage(img, 150, 200, 200, 250);
+    }
+  }
+
+  /**
+  * ボス戦へ遷移するボタンを表示する関数
+  */ 
+  function bossButtleButtonCreateElement() {
+    bossButtleButton.textContent = "ボスと戦う！";
+    document.getElementById( "button-area" ).appendChild( bossButtleButton );
+  }
+
+  /**
+  * ボス戦へ遷移するボタンクリック時の処理を行う関数
+  */ 
+  bossButtleButton.onclick = () => {
+    document.location.href = "./b1fboss.html";
+  }
+
+  /**
+  * キー押下時（タイピング時）に呼び出される関数
+  */
+  document.onkeydown = () => {
+    const maxPoints = 50;                   // ノーミス時の点数（ボーナス点は含まない）
+    const bonusPointSeconds = 4;            // ボーナスポイント対象となる秒数
+    if (typedCount === 0) {
+      startTime = Date.now();    // 1文字目のタイピング開始時にタイム取得を始める
+    }
+    if (flgTypeEnd === 0) {      // flg=0の時（=タイピングを終えていない時）のみ入力判断をする
+      if (event.keyCode + 32 === typingTexts[randomNumber].charCodeAt(typedCount))  // 入力した文字が正しいとき
+      {
+        sampleDivided[typedCount].style.color = '#0000ff';
+        points = points + 10;
+      } else {    // 入力した文字が誤っているとき
+          sampleDivided[typedCount].style.color = '#ff0000';
+          points = points - 10;
+      }
+      typedCount++;
+
+      // 画面に表示された文字数分をタイプした後の処理
+      if (dispTypeText.length === typedCount) {
+        var currentTime = Date.now();                     // タイマーを止める
+        var seconds = (currentTime - startTime) / 1000;   // タイピングに要した秒数を計算
+        flgTypeEnd = 1;                                   // タイピング終了フラグをON
+
+        // 一定時間以内にタイプできて、かつ誤りが無ければボーナスポイント加算
+        if (seconds <= bonusPointSeconds && points === maxPoints) { 
+          points = points + 10;
+        } 
+
+        /* スタート地点より後ろへ下がらないようにポイントとメッセージを調整
+         この階で歩く必要がある歩数から現時点でのゴールまでの残り歩数を引く。これはスタート地点から現在地点までの歩数である。
+         その数よりも実際に後退する歩数が多い場合、スタート地点より後ろに下がってしまうため、調整を行う。
+        */
+        if (points < 0) { 
+            if (allRemainingwalkCounts - remainingWalkCount < points * (-1) ) { 
+            points = (allRemainingwalkCounts - remainingWalkCount) * (-1);
+          }
+        }
+
+        /* ゴール地点より前へ進まないようにポイントとメッセージを調整
+         残り歩数よりも得たポイントが多い場合に調整を行う。
+         */
+        if (points > 0) { 
+            if (remainingWalkCount < points) { 
+            points = remainingWalkCount;
+          }
+        }
+        // 結果メッセージの表示
+        if (points < 0) {                     // ポイントが0未満の時
+          resultText.innerText = (points * -1) + '歩後ろへ下がってしまった！'; 
+        } else if (points > 0) {              // ポイントが0より上の時
+          resultText.innerText = points + '歩前へ進んだ！';
+        } else {                              // ポイントが0の時
+          resultText.innerText = 'あなたはその場にとどまっている。';
+        }
+        remainingWalkCount = remainingWalkCount - points;   // 残り歩数にポイント（pointsの逆数）を加算
+ 
+        // 残り歩数が0から必要最大歩数の間に収まるように調整
+        if (remainingWalkCount < 0) {
+          remainingWalkCount = 0;
+        }
+        if (remainingWalkCount > allRemainingwalkCounts) {
+          remainingWalkCount = allRemainingwalkCounts;
+        }
+ 
+        if (remainingWalkCount !== 0) {    // 残り歩数が0でない時
+          removeAllChildren(resultDivided);
+          resultDivided.style.color = "#ffffff";
+          resultDivided.appendChild(resultText);
+          // サンプル文字列を消す
+          setTimeout(() => {
+            removeAllChildren(resultDivided);
+            for (var l=0; l<typingTextCharNumber; l++) {
+              removeAllChildren(sampleDivided[l]);
+              sampleDivided[l].style.color = "#ffffff";
+            }
+          }, 1500);
+          displayStatus();
+          // 次のサンプル文字列を表示
+          setTimeout(() => {
+            displayTypingText();
+            flgTypeEnd = 0;
+          }, 2500);
+        } else {    // 残り歩数が0の時
+          resultDivided.style.color = "#ffffff";
+          resultDivided.appendChild(resultText);  // 何歩進んだか表示
+          // ゴール到達時の画面とテキストを表示
+          removeAllChildren(statusDivided);
+          displayGoalGraphic();
+          setTimeout(() => {
+            removeAllChildren(resultDivided);
+            resultText.innerText = '「これは！地上へ出るハシゴに違いない！」';
+            resultDivided.appendChild(resultText);
+          }, 1000)
+          setTimeout(() => {
+            displayBossGraphic();
+            removeAllChildren(statusDivided);
+            statusText.innerText = '「よくここまで来ましたね。これが最後の試練です」';
+            statusDivided.appendChild(statusText);
+          }, 3000)
+          setTimeout(() => {
+            displayBossGraphic();
+            removeAllChildren(remarksDivided);
+            remarksText.innerText = 'なんとラスボスが現れた！戦いますか？';
+            remarksDivided.appendChild(remarksText);
+            bossButtleButtonCreateElement();
+          }, 5000)
+          // サンプル文字列の消去
+          setTimeout(() => {
+            for (var l=0; l<typingTextCharNumber; l++) {
+              removeAllChildren(sampleDivided[l]);
+              sampleDivided[l].style.color = "#ffffff";
+            }
+          }, 1000);        
+        }
+        // 変数を初期化
+        points = 0;
+        typedCount = 0;
+    }
+  }
+}
+})();
